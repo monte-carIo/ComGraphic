@@ -5,7 +5,6 @@ from libs.shader import *
 from libs import transform as T
 from libs.buffer import *
 import ctypes
-from fourier_series import create_fourier_mesh, generate_fourier_mesh
 
 import numpy as np
 
@@ -184,7 +183,8 @@ def generate_grid_mesh(equation_func, grid_size=10, spacing=0.3):
 
     return vertices, indices, colors, normals
 
-
+def generate_fourier_mesh(equation_func):
+    pass
 
 class Mesh:
     def __init__(self, vert_shader, frag_shader, type):
@@ -201,13 +201,8 @@ class Mesh:
         elif type == 'mesh':
             equation_func = get_user_input_equation()
             self.vertices, self.indices, self.colors, self.normals = generate_grid_mesh(equation_func)
-        elif type == 'fourier':
-            equation_func = get_user_input_equation()
-            self.equation_func = equation_func
-            self.coeffs = create_fourier_mesh(equation_func)
-            self.vertices, self.indices, self.colors, self.normals = generate_fourier_mesh(10, self.coeffs)
-        else:
-            raise ValueError(f"Invalid mesh type: {type}")
+        elif type == 'fourier_series':
+            self.vertices, self.indices, self.colors, self.normals = generate_fourier_mesh(equation_func)
 
         # Set up the Vertex Array Object (VAO)
         self.vao = VAO()
@@ -242,14 +237,4 @@ class Mesh:
         self.vao.activate()
         GL.glDrawElements(GL.GL_TRIANGLE_STRIP,
                         self.indices.shape[0], GL.GL_UNSIGNED_INT, None)
-        
-    def update(self,arg):
-        new_n_terms = arg['n_terms']
-        
-        del self.vao
-        self.vao = VAO()
-        
-        self.vertices, self.indices, self.colors, self.normals = generate_fourier_mesh(new_n_terms, self.coeffs)
-        
-        self.setup()
 
