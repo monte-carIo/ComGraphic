@@ -5,7 +5,7 @@ from libs.shader import *
 from libs import transform as T
 from libs.buffer import *
 import ctypes
-from fourier_series import create_fourier_mesh, generate_fourier_mesh
+from fourier_series import create_fourier_mesh, generate_fourier_mesh, fourier_approximation
 
 import numpy as np
 
@@ -205,7 +205,8 @@ class Mesh:
             equation_func = get_user_input_equation()
             self.equation_func = equation_func
             self.coeffs = create_fourier_mesh(equation_func)
-            self.vertices, self.indices, self.colors, self.normals = generate_fourier_mesh(10, self.coeffs)
+            self.Z_list = fourier_approximation(self.coeffs, 100)
+            self.vertices, self.indices, self.colors, self.normals = generate_fourier_mesh(self.Z_list[10])
         else:
             raise ValueError(f"Invalid mesh type: {type}")
 
@@ -245,11 +246,15 @@ class Mesh:
         
     def update(self,arg):
         new_n_terms = arg['n_terms']
+        if new_n_terms < 0:
+            new_n_terms = 0
+        if new_n_terms >= len(self.Z_list):
+            new_n_terms = len(self.Z_list) - 1
         
         del self.vao
         self.vao = VAO()
         
-        self.vertices, self.indices, self.colors, self.normals = generate_fourier_mesh(new_n_terms, self.coeffs)
+        self.vertices, self.indices, self.colors, self.normals = generate_fourier_mesh(self.Z_list[new_n_terms])
         
         self.setup()
 

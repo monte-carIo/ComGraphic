@@ -283,7 +283,7 @@ class Viewer:
                 }
             elif isinstance(model,Mesh):
                 self.model_dict['Mesh'] = {
-                    'n_terms': [1,10,100,10],
+                    'n_terms': [1,10,49,10],
                 }
         self.drawables.extend(drawables)
 
